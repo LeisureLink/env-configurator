@@ -6,3 +6,4 @@ node_modules
 /.ntvs_analysis.dat
 *.cmd
 coverage.html
+/documentation
