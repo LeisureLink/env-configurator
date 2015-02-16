@@ -1,12 +1,16 @@
 {
-  "name": "env-configurator",
-  "version": "0.0.1",
-  "description": "Configuration library that attempts to get service configuration based on DNS SRV records",
-  "main": "index.js",
-  "author": {
-    "email": "mhughes@leisurelink.com",
-    "name": "Michael Hughes"
-  },
+    "name": "env-configurator",
+    "version": "0.0.1",
+    "description": "Configuration library that attempts to get service configuration based on DNS SRV records",
+    "main": "index.js",
+    "author": {
+        "email": "mhughes@leisurelink.com",
+        "name": "Michael Hughes"
+    },
+    "scripts": { 
+        "test": "mocha -R spec"
+    },
+    "repository": {"type": "git", "url": "git+ssh://git@github.com:LeisureLink/env-configurator.git"},
   "private": true,
   "dependencies": {
     "assert-plus": "^0.1.5"
