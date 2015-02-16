@@ -1,4 +1,6 @@
 ﻿'use strict';
+/*jshint -W097*/
+/*global it: false, describe: false*/
 var expect = require('expect')
   , sandboxedModule = require('sandboxed-module');
 var getConfig = sandboxedModule.require('../lib/index.js', {
@@ -30,7 +32,7 @@ describe('dns-configurator', function () {
         }
       ]
     }, function (config) {
-      expect(config['foo']).toNotExist('Config result should not contain names for which there was no result');
+      expect(config.foo).toNotExist('Config result should not contain names for which there was no result');
     });
   });
 

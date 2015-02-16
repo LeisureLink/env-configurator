@@ -1,7 +1,5 @@
-﻿'use strict';
-
+﻿
 var getConfig = require('./lib');
-var fs = require('fs');
 /**
  * Exports the components from the dns-configurator library
  * @param {object} config - A config object that defines what SRV records the dns configurator to attempt to lookup, note if this is empty the library
@@ -11,6 +9,7 @@ var fs = require('fs');
  * @module env-configurator
  */
 module.exports = function getDefaults(config, callback) {
+  'use strict';
   var names = config || {};
-  getConfig(config, callback);
-}
+  getConfig(names, callback);
+};
