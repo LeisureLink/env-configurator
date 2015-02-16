@@ -7,8 +7,9 @@
         "email": "mhughes@leisurelink.com",
         "name": "Michael Hughes"
     },
-    "scripts": { 
-        "test": "mocha -R spec"
+    "scripts": {
+        "test": "mocha -R spec",
+        "doc": "jsdoc -c ./jsdoc.conf -r -d ./documentation/"
     },
     "repository": {"type": "git", "url": "git+ssh://git@github.com:LeisureLink/env-configurator.git"},
   "private": true,
