@@ -6,5 +6,5 @@ dependencies:
 ## After tests run jshint and jsdoc
 test:
     post:
-        - jshint lib/**/*.js routes/**/*.js app.js config/*.js lib/*.js routes/*.js test/*.js test/**/*.js >> $CIRCLE_ARTIFACTS/jshint.log
+        - jshint index.js lib/*.js test/*.js >> $CIRCLE_ARTIFACTS/jshint.log
         - jsdoc -c ./jsdoc.conf -r -d $CIRCLE_ARTIFACTS/documentation/

@@ -14,6 +14,11 @@ describe('dns configurator formatters', function () {
     expect(result).toBe('mongodb://foo.example.com:27017/');
   });
   
+  it('should format a mongodb driver URL with a URL suffix specified and use the top ranked address', function () {
+    var result = underTest.mongodb(addresses, undefined, 'default');
+    expect(result).toBe('mongodb://foo.example.com:27017/default');
+  });
+  
   it('should format a HTTP url using the top ranked result', function () {
     var result = underTest.http(addresses);
     expect(result).toBe('http://foo.example.com:27017/');
@@ -26,6 +31,11 @@ describe('dns configurator formatters', function () {
   
   it('should format a name using the top ranked result', function () {
     var result = underTest.bareName(addresses);
-    expect(result).toBe('foo.example.com');
+    expect(result).toBe('foo.example.com:27017');
+  });
+
+  it('should format a name using the top ranked result with a prefix and suffix', function () {
+    var result = underTest.bareName(addresses, 'baz', '/default');
+    expect(result).toBe('bazfoo.example.com:27017/default');
   });
 });
