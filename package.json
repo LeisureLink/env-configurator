@@ -1,6 +1,6 @@
 {
     "name": "env-configurator",
-    "version": "0.0.1",
+    "version": "0.1.1",
     "description": "Configuration library that attempts to get service configuration based on DNS SRV records",
     "main": "index.js",
     "author": {
