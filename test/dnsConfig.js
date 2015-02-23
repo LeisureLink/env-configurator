@@ -49,4 +49,21 @@ describe('dns-configurator', function () {
       expect(config['bar.services.local']).toBe('http://bar.example.com:27017/');
     });
   });
+  
+  it('should process a valid response from a SRV record lookup and apply post/pre-fixs', function () {
+    getConfig({
+      'services': [
+        {
+          'name': 'bar.services.local',
+          'formatter': 'http',
+          'prefix': 'baz',
+          'suffix': 'default'
+        }
+      ]
+    }, function (config) {
+      expect(config['bar.services.local']).toExist("Config should have configuration property");
+      expect(config['bar.services.local']).toBe('http://bazbar.example.com:27017/default');
+    });
+  })
+
 });
