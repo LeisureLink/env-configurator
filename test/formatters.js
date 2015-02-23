@@ -17,7 +17,7 @@ describe('dns configurator formatters', function () {
   it('should format a mongodb driver URL with a URL suffix specified and use the top ranked address', function () {
     var result = underTest.mongodb(addresses, undefined, 'default');
     expect(result).toBe('mongodb://foo.example.com:27017/default');
-  })
+  });
   
   it('should format a HTTP url using the top ranked result', function () {
     var result = underTest.http(addresses);

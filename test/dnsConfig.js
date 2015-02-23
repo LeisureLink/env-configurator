@@ -64,6 +64,6 @@ describe('dns-configurator', function () {
       expect(config['bar.services.local']).toExist("Config should have configuration property");
       expect(config['bar.services.local']).toBe('http://bazbar.example.com:27017/default');
     });
-  })
+  });
 
 });
