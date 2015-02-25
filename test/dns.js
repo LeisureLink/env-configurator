@@ -3,7 +3,7 @@
 /*global it: false, describe: false*/
 var expect = require('expect')
   , sandboxedModule = require('sandboxed-module');
-var getConfig = sandboxedModule.require('../lib/index.js', {
+var getConfig = sandboxedModule.require('../lib/dns.js', {
   requires: { 'dns': {
         _validResults: [{ 'priority': 10, 'weight': 5, 'port': 27017, 'name': 'foo.example.com' },
           { 'priority': 20, 'weight': 5, 'port': 27017, 'name': 'bar.example.com' }],
