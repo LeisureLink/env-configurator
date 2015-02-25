@@ -1,5 +1,4 @@
-﻿
-var getConfig = require('./lib');
+﻿var getConfig = require('./lib');
 /**
  * Exports the components from the dns-configurator library
  * @param {object} config - A config object that defines what SRV records the dns configurator to attempt to lookup, note if this is empty the library
