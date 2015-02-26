@@ -29,14 +29,10 @@ configuration object is (in JSON):
 
 
     {
-        "consulAgent": {
-            "host": "127.0.0.1",
-            "port": "8500",
-            "secure": true
-        },
         "services": [
             {
-                "name": "The DNS name to look up",
+                "serviceName": "The DNS name to look up",
+                "name": "The name by which to return the retrieved service"
                 "formatter": "The name of the formatter to use on the DNS SRV record response",
                 "prefix": "A prefix to prepend to the name in the DNS SRV record response",
                 "suffix": "A suffix to postpend to the formatter DNS SRV record"
@@ -54,6 +50,10 @@ configuration object is (in JSON):
                     "required": true
                 }
             }
+        },
+        "libraryConfig": [
+            "trusted-client",
+            "auth-context"
         }
     }
 
@@ -69,10 +69,14 @@ services. If the key is marked as required then the configuration process will s
 error (what error??). 
 
 By default env-configurator will search the application's runtime environment variables according to the following
-pattern for the ith key in the configuration structure:
+pattern for the ith property in the configuration structure:
 
 ```keyValues.prefix + '_' + keys[i].name```
 
-If a ```consulAgent``` property is defined in the env-configurator's config object then it will attempt to search the local
-consul agent as well for key values. Please note that environmental variables take precedence over the values stored
-in any remote consul agent. 
+If environment variables (names TBD) for consul are defined then env-configurator will attempt to search the local
+consul agent as well for key values. 
+
+
+The ```libraryConfig``` section instructs env-configuration load an env-configurator file from 
+a library loaded by the client application. The configuration for the library will be returned
+using the require name for the library (the same name as passed into the ```libraryConfig``` array.)
