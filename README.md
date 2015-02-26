@@ -44,16 +44,16 @@ configuration object is (in JSON):
         ],
         "keyValues": {
             "prefix": "SomeAppNamePrefix",
-            "keys": [
-                {
+            "keys": {
+                "env": {
                     "name": "env",
                     "required": false
                 },
-                {
+                "endpointKeyFile": {
                     "name": "endpointKeyFile",
                     "required": true
                 }
-            ]
+            }
         }
     }
 
