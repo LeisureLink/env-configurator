@@ -34,8 +34,9 @@
   <ItemGroup>
     <Compile Include="index.js" />
     <Compile Include="lib\formatters.js" />
+    <Compile Include="lib\dns.js" />
     <Compile Include="lib\index.js" />
-    <Compile Include="test\dnsConfig.js">
+    <Compile Include="test\dns.js">
       <SubType>Code</SubType>
       <TestFramework>Mocha</TestFramework>
     </Compile>
@@ -43,6 +44,7 @@
       <SubType>Code</SubType>
       <TestFramework>Mocha</TestFramework>
     </Compile>
+    <Content Include="lib\configuration-schema.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
   </ItemGroup>

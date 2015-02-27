@@ -1,5 +1,4 @@
-﻿var getConfig = require('./lib');
-/**
+﻿/**
  * Exports the components from the env-configurator library
  * @param {object} callback - A callback function provided by the application in case it wants notification of when configuration is complete
  * and the configuration data
@@ -10,16 +9,20 @@ module.exports = (function () {
   var jayschema = require('jayschema'),
       schema = require('./lib/configuration-schema.json'),
       jptr = require('json-ptr'),
-      assert = require('assert-plus');
+      assert = require('assert-plus'),
+      getConfig = require('./lib/index.js');
   
-  function configurator() {
+  function Configurator() {
     var appConfiguration = {},
         appConfigSpecs = {};
+
+    function validateClientConfig(configSpec, done) {
+      jayschema.validate(configSpec, this.schema, done);
+    }
+
   };
 
-  function validateClientConfig(configSpec, done) {
-    jayschema.validate(configSpec, this.schema, done);
-  }
+
 
   function renew(context) {
     //no-op
@@ -41,7 +44,7 @@ module.exports = (function () {
       assert.string(context, 'context');
       assert.string(ptr, 'ptr');
       var ptr = jptr.create(ptr);
-      return ptr.get(appConfiguration[context]);
+      return ptr.get(this.appConfiguration[context]);
     }
   });
   
@@ -62,14 +65,22 @@ module.exports = (function () {
   Object.defineProperty(configurator.prototype, 'fulfill', {
     value: function fulfill(configSpec, configFulfilled) {
       assert.optionalFunc(configFulfilled, 'configFulfilled');
-      validateClientConfig(configSpec, function (err) {
+      this.validateClientConfig(configSpec, function (err) {
         if (!err) {
-          appConfigSpecs[configSpec.name] = configSpec;
-          if (!(configSpec.name in appConfiguration)) {
-            appConfiguration[configSpec.name] = {};
+          this.appConfigSpecs[configSpec.name] = configSpec;
+          if (!(configSpec.name in this.appConfiguration)) {
+            this.appConfiguration[configSpec.name] = {};
           }
+          getConfig(configSpec, function (err, config) {
+            if (!err) {
+              appConfiguration[configSpec.name] = {};
+            }
+            configFulfilled(err);
+          })
+        } else {
+          configFulfilled(err);
         }
-      })
+      });
     }
   });
 

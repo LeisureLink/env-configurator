@@ -3,45 +3,45 @@
 	"title": "Configuration",
 	"description": "A LeisureLink node component configuration",
 	"type": "object",
-	"properties": {
-		"name": {
-			"description": "The name of the component requesting configuration, this name will be prefix onto consul and env var lookups",
-			"type": "string",
-			"required": true
-		},
-		"keys": {
-			"type": "array",
-			"description": "JSON pointers that identify configuration keys",
-			"items": {
-				"type":"string"
-			}
-		},
-		"services": {
-			"type": "array",
-			"description": "An array of services to look up in DNS",
-			"items": {
-				"type": "object",
-				"properties": {
-					"name": {
-						"type": "string",
-						"description": "The service name to lookup",
-						"required": true
-					},
-					"formatter": {
-						"type": "string",
-						"description": "the name of a support Uri formatter",
-						"enum": [ "mongodb", "bareName", "http", "https" ]
-					},
-					"suffix": {
-						"type": "string",
-						"description": "The key name (JSON pointer) to a suffix to add to the returned URI"
-					},
-					"prefix": {
-						"type": "string",
-						"description": "The key name (JSON pointer) to a prefix to add to the host name of the returned URI"
-					}
-				}
-			}
-		}
-	}
+    "properties": {
+        "name": {
+            "description": "The name of the component requesting configuration, this name will be prefix onto consul and env var lookups",
+            "type": "string"
+        },
+        "keys": {
+            "type": "array",
+            "description": "JSON pointers that identify configuration keys",
+            "items": {
+                "type": "string"
+            }
+        },
+        "services": {
+            "type": "array",
+            "description": "An array of services to look up in DNS",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The service name to lookup",
+                    },
+                    "formatter": {
+                        "type": "string",
+                        "description": "the name of a support Uri formatter",
+                        "enum": [ "mongodb", "bareName", "http", "https" ]
+                    },
+                    "suffix": {
+                        "type": "string",
+                        "description": "The key name (JSON pointer) to a suffix to add to the returned URI"
+                    },
+                    "prefix": {
+                        "type": "string",
+                        "description": "The key name (JSON pointer) to a prefix to add to the host name of the returned URI"
+                    }
+                },
+                "required": ["name"]
+            }
+        }
+    },
+    "required": ["name"]
 }
