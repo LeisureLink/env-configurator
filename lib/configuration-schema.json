@@ -1,8 +1,8 @@
 ﻿{
-	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "Configuration",
-	"description": "A LeisureLink node component configuration",
-	"type": "object",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Configuration",
+    "description": "A LeisureLink node component configuration",
+    "type": "object",
     "properties": {
         "name": {
             "description": "The name of the component requesting configuration, this name will be prefix onto consul and env var lookups",
@@ -23,7 +23,11 @@
                 "properties": {
                     "name": {
                         "type": "string",
-                        "description": "The service name to lookup",
+                        "description": "The service name to lookup"
+                    },
+                    "key": {
+                        "type": "string",
+                        "description": "A JSON pointer that the client can use to retrieve the configured service"
                     },
                     "formatter": {
                         "type": "string",
@@ -39,7 +43,7 @@
                         "description": "The key name (JSON pointer) to a prefix to add to the host name of the returned URI"
                     }
                 },
-                "required": ["name"]
+                "required": [ "name", "key" ]
             }
         }
     },
