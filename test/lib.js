@@ -6,9 +6,14 @@ var expect = require('expect'),
     underTest = sandboxedModule.require('../lib/index.js', {
       'requires' : {
         './dns.js': function (config, cb) {
-          var result = {};
-          if (config.name) {
-            result[config.name] = 'https://foo.example.com/bar';
+          var result = {},
+              service;
+          if (config.services) {
+            for (service in config.services) {
+              result[config.services[service].name] = {};
+              result[config.services[service].name].value = 'https://foo.example.com:443/bar';
+              result[config.services[service].name].key = config.services[service].key;
+            }
             cb(null, result);
           } else {
             cb(new AssertionError('test'), null);
@@ -40,7 +45,7 @@ var expect = require('expect'),
                 ]);
               }
             }
-          }
+          };
         }
       }
     }),
@@ -97,7 +102,7 @@ describe('env-configurator lib', function () {
   });
   
   it('should correctly retrieve a single variable from the environment', function () {
-    process.env['TEST_ME'] = 'foobar';
+    process.env.TEST_ME = 'foobar';
     underTest({
       name: 'TEST',
       keys: [
@@ -110,10 +115,28 @@ describe('env-configurator lib', function () {
     });
   });
   
+  it('should correctly retrieve multiple multi-leveled variables from the environment', function () {
+    process.env.TEST_ME = 'foobar';
+    process.env.TEST_BAR_BAZ = 'foobar';
+    underTest({
+      name: 'TEST',
+      keys: [
+        '#/me',
+        '#/bar/baz'
+      ]
+    }, function (err, config) {
+      expect(err).toBe(null);
+      expect(config).toNotBe(null);
+      expect(config.me).toBe('foobar');
+      expect(config.bar).toExist();
+      expect(config.bar.baz).toBe('foobar');
+    });
+  });
+  
   it('should correctly retrieve a single variable from consul', function () {
-    process.env['CONSUL_HOST'] = 'localhost';
-    process.env['CONSUL_PORT'] = '234';
-    process.env['CONSUL_SECURE'] = true;
+    process.env.CONSUL_HOST = 'localhost';
+    process.env.CONSUL_PORT = '234';
+    process.env.CONSUL_SECURE = true;
     
     underTest({
       name: 'TEST',
@@ -125,6 +148,81 @@ describe('env-configurator lib', function () {
       expect(config).toNotBe(null);
       expect(config.foo).toBe('dGVzdA==');
       expect(config.bar).toBe(undefined);
+    });
+  });
+
+  it('should allow the env configuration provider to override the consul config provider for KV pairs', function () {
+    process.env.CONSUL_HOST = 'localhost';
+    process.env.CONSUL_PORT = '234';
+    process.env.CONSUL_SECURE = true;
+    process.env.TEST_FOO = 'foobar';
+    
+    underTest({
+      name: 'TEST',
+      keys: [
+        '#/foo'
+      ]
+    }, function (err, config) {
+      expect(err).toBe(null);
+      expect(config).toNotBe(null);
+      expect(config.foo).toBe('foobar');
+      expect(config.bar).toBe(undefined);
+    });
+  });
+
+  it('should retrieve service configuration from the DNS if so configured', function () {
+    underTest({
+      name: 'TEST',
+      services: [
+        {
+          name: 'foo.service.consul',
+          key: '#/foo/uri',
+          formatter: 'https'
+        }
+      ]
+    }, function (err, config) {
+      expect(err).toBe(null);
+      expect(config).toNotBe(null);
+      expect(config.foo).toNotBe(null);
+      expect(config.foo.uri).toBe('https://foo.example.com:443/bar');
+    });
+  });
+
+  it('should retrieve service configuration from the DNS if so configured', function () {
+    underTest({
+      name: 'TEST',
+      services: [
+        {
+          name: 'foo.service.consul',
+          key: '#/foo/uri',
+          formatter: 'https'
+        }
+      ]
+    }, function (err, config) {
+      expect(err).toBe(null);
+      expect(config).toNotBe(null);
+      expect(config.foo).toNotBe(null);
+      expect(config.foo.uri).toBe('https://foo.example.com:443/bar');
+    });
+  });
+
+  it('should allow the service configuration from DNS to override env configuration', function () {
+    process.env.TEST_FOO_URI = 'should_not_be_returned';
+    
+    underTest({
+      name: 'TEST',
+      services: [
+        {
+          name: 'foo.service.consul',
+          key: '#/foo/uri',
+          formatter: 'https'
+        }
+      ]
+    }, function (err, config) {
+      expect(err).toBe(null);
+      expect(config).toNotBe(null);
+      expect(config.foo).toNotBe(null);
+      expect(config.foo.uri).toBe('https://foo.example.com:443/bar');
     });
   });
 });

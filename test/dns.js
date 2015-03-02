@@ -2,7 +2,8 @@
 /*jshint -W097*/
 /*global it: false, describe: false*/
 var expect = require('expect')
-  , sandboxedModule = require('sandboxed-module');
+  , sandboxedModule = require('sandboxed-module')
+  , AssertionError = require('assert').AssertionError;
 var getConfig = sandboxedModule.require('../lib/dns.js', {
   requires: { 'dns': {
         _validResults: [{ 'priority': 10, 'weight': 5, 'port': 27017, 'name': 'foo.example.com' },
@@ -16,8 +17,24 @@ var getConfig = sandboxedModule.require('../lib/dns.js', {
 });
 
 describe('dns-configurator', function () {
+  
+  it('should throw an error is not passed a call back function', function () {
+    try {
+      getConfig({}, 'foo');
+      throw new Error('Should have thrown error');
+    } catch (err) {
+      expect(err instanceof AssertionError).toBe(true)
+    }
+    try {
+      getConfig({}, undefined);
+      throw new Error('Should have thrown error');
+    } catch (err) {
+      expect(err instanceof AssertionError).toBe(true)
+    }
+  });
+
   it('should do nothing when given an empty configuration object', function () {
-    getConfig({}, function (config) {
+    getConfig({}, function (err, config) {
       expect(config['bar.services.local']).toNotExist('Config result should be an empty object');
       expect(config['foo.services.local']).toNotExist('Config result should be an empty object');
     });
@@ -28,6 +45,7 @@ describe('dns-configurator', function () {
       'services': [
         {
           'name': 'foo',
+          'key': '#/foo',
           'formatter': 'http'
         }
       ]
@@ -41,12 +59,14 @@ describe('dns-configurator', function () {
       'services': [
         {
           'name': 'bar.services.local',
+          'key': '#/bar/uri',
           'formatter': 'http'
         }
       ]
-    }, function (config) {
+    }, function (err, config) {
       expect(config['bar.services.local']).toExist("Config should have configuration property");
-      expect(config['bar.services.local']).toBe('http://bar.example.com:27017/');
+      expect(config['bar.services.local'].key).toBe('#/bar/uri');
+      expect(config['bar.services.local'].value).toBe('http://bar.example.com:27017/');
     });
   });
   
@@ -55,14 +75,16 @@ describe('dns-configurator', function () {
       'services': [
         {
           'name': 'bar.services.local',
+          'key': '#/bar/uri',
           'formatter': 'http',
           'prefix': 'baz',
           'suffix': 'default'
         }
       ]
-    }, function (config) {
+    }, function (err, config) {
       expect(config['bar.services.local']).toExist("Config should have configuration property");
-      expect(config['bar.services.local']).toBe('http://bazbar.example.com:27017/default');
+      expect(config['bar.services.local'].value).toBe('http://bazbar.example.com:27017/default');
+      expect(config['bar.services.local'].key).toBe('#/bar/uri');
     });
   });
 
