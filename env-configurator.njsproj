@@ -44,6 +44,11 @@
       <SubType>Code</SubType>
       <TestFramework>Mocha</TestFramework>
     </Compile>
+    <Compile Include="test\lib.js">
+      <SubType>Code</SubType>
+      <TestFramework>Mocha</TestFramework>
+    </Compile>
+    <Content Include="config-example.json" />
     <Content Include="lib\configuration-schema.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
