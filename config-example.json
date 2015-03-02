@@ -1,0 +1,25 @@
+{
+    "name": "some-app",
+    "keys": [
+        "#/mandril/apiKey",
+        "#/authentic/publicKeyUri"
+    ],
+    "services": [
+        {
+            "name": "dev.mandril.service.consul",
+            "key": "#/mandril/baseUri",
+            "formatter": "https"
+        },
+        {
+            "name": "dev.authentic.service.consul",
+            "key": "#/authentic/baseUri",
+            "formatter": "https"
+        },
+        {
+            "name": "dev.mongodb.service.consul",
+            "key": "#/db/uri",
+            "formatter": "mongodb",
+            "suffix": "#/db/name"
+        }
+    ]
+}
