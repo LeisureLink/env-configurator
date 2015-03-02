@@ -6,23 +6,21 @@
  */
 module.exports = (function () {
   'use strict';
-  var jayschema = require('jayschema'),
+  var JaySchema = require('jayschema'),
+      jaySchema = new JaySchema(),
       schema = require('./lib/configuration-schema.json'),
       jptr = require('json-ptr'),
       assert = require('assert-plus'),
       getConfig = require('./lib/index.js');
   
-  function Configurator() {
-    var appConfiguration = {},
-        appConfigSpecs = {};
+  function validateClientConfig(configSpec, done) {
+    jaySchema.validate(configSpec, schema, done);
+  }
 
-    function validateClientConfig(configSpec, done) {
-      jayschema.validate(configSpec, this.schema, done);
-    }
-
-  };
-
-
+  var Configurator = function () {
+    this.appConfiguration = {};
+    this.appConfigSpecs = {};
+  }
 
   function renew(context) {
     //no-op
@@ -36,11 +34,11 @@ module.exports = (function () {
    * Returns a configuration property from a particular configuration context as identified by a JSON-ptr
    * @name module:env-configurator#configurator#get
    * @param {string} context - The configurator context, this name corresponds to the configuration spec name
-   * @param {string} ptr - A @{link http://tools.ietf.org/html/rfc6901|JSON ptr} string to the value the client needs
+   * @param {string} ptrStr - A @{link http://tools.ietf.org/html/rfc6901|JSON ptr} string to the value the client needs
    * @returns The requested value or undefined
    */
-  Object.defineProperty(configurator.prototype, 'get', {
-    value: function get(context, ptr) {
+  Object.defineProperty(Configurator.prototype, 'get', {
+    value: function get(context, ptrStr) {
       assert.string(context, 'context');
       assert.string(ptr, 'ptr');
       var ptr = jptr.create(ptr);
@@ -62,28 +60,32 @@ module.exports = (function () {
    * @param {object} configSpec - A config object described by the @{link file://lib/configuration-schema.json|the configurator's JSON schema}
    * @param {configFulfilled} [configFulfilled] - An optional callback function that will be called when successful configuration is complete or when an error is encountered
    */
-  Object.defineProperty(configurator.prototype, 'fulfill', {
+  Object.defineProperty(Configurator.prototype, 'fulfill', {
     value: function fulfill(configSpec, configFulfilled) {
       assert.optionalFunc(configFulfilled, 'configFulfilled');
-      this.validateClientConfig(configSpec, function (err) {
+      validateClientConfig(configSpec, function (err) {
         if (!err) {
-          this.appConfigSpecs[configSpec.name] = configSpec;
+          appConfigSpecs[configSpec.name] = configSpec;
           if (!(configSpec.name in this.appConfiguration)) {
-            this.appConfiguration[configSpec.name] = {};
+            appConfiguration[configSpec.name] = {};
           }
           getConfig(configSpec, function (err, config) {
             if (!err) {
               appConfiguration[configSpec.name] = {};
             }
-            configFulfilled(err);
-          })
+            if (configFulfilled) {
+              configFulfilled(err);
+            }
+          });
         } else {
-          configFulfilled(err);
+          if (configFulfilled) {
+            configFulfilled(err);
+          }
         }
       });
     }
   });
 
-  return configurator;
+  return Configurator;
 
 })();
