@@ -82,6 +82,15 @@ The configurator will look for an environment variable with the name
 ```A_FOO```. In short, names are prefixed with the provided app name,
 '/' are transformed into '_', and all components are upper cased.
 
+#### When naming variables
+
+Keep in mind rules for POSIX and Windows environment variable names:
+
+  - [POSIX](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap08.html)
+  - [Windows](https://msdn.microsoft.com/en-us/library/windows/desktop/ms682009(v=vs.85).aspx)
+
+Generally speaking, things matching /[A-Z0-9_]+/ should be safe to use.
+
 ### Consul KV lookup
 
 Given:
