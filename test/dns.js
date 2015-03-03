@@ -23,13 +23,13 @@ describe('dns-configurator', function () {
       getConfig({}, 'foo');
       throw new Error('Should have thrown error');
     } catch (err) {
-      expect(err instanceof AssertionError).toBe(true)
+      expect(err instanceof AssertionError).toBe(true);
     }
     try {
       getConfig({}, undefined);
       throw new Error('Should have thrown error');
     } catch (err) {
-      expect(err instanceof AssertionError).toBe(true)
+      expect(err instanceof AssertionError).toBe(true);
     }
   });
 
