@@ -5,14 +5,14 @@ var expect = require('expect'),
     sandboxedModule = require('sandboxed-module'),
     underTest = sandboxedModule.require('../lib/index.js', {
       'requires' : {
-        './dns.js': function (config, cb) {
+        './dns.js': function (configSpec, config, cb) {
           var result = {},
               service;
-          if (config.services) {
-            for (service in config.services) {
-              result[config.services[service].name] = {};
-              result[config.services[service].name].value = 'https://foo.example.com:443/bar';
-              result[config.services[service].name].key = config.services[service].key;
+          if (configSpec.services) {
+            for (service in configSpec.services) {
+              result[configSpec.services[service].name] = {};
+              result[configSpec.services[service].name].value = 'https://foo.example.com:443/bar';
+              result[configSpec.services[service].name].key = configSpec.services[service].key;
             }
             cb(null, result);
           } else {
