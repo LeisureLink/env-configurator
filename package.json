@@ -20,7 +20,8 @@
     "assert-plus": "^0.1.5",
     "async": "^0.9.0",
     "consul": "^0.12.0",
-    "jayschema": "^0.3.1"
+    "jayschema": "^0.3.1",
+    "json-ptr": "^0.2.0"
   },
   "devDependencies": {
     "expect": "^1.6.0",
