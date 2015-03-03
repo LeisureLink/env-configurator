@@ -61,4 +61,42 @@ describe('env-configurator', function () {
       });
     });
   });
+
+  it('should renew an existing configuration if renew(name) is called', function () {
+    process.env.TEST6_BAR = 'baz';
+    underTest = new UnderTest();
+    
+    underTest.fulfill({
+      "name": "test6",
+      "keys": [
+        "#/bar"
+      ]
+    }, function (errs) {
+      expect(underTest.get('test6', '#/bar')).toBe('baz');
+      process.env.TEST6_BAR = 'foo';
+      underTest.renew('test6', function (err) {
+        expect(err).toNotExist();
+        expect(underTest.get('test6', '#/bar')).toBe('foo');
+      });
+    });
+  });
+
+  it('should renew an existing configuration if renewAll is called', function () {
+    process.env.TEST7_BAR = 'baz';
+    underTest = new UnderTest();
+    
+    underTest.fulfill({
+      "name": "test7",
+      "keys": [
+        "#/bar"
+      ]
+    }, function (errs) {
+      expect(underTest.get('test7', '#/bar')).toBe('baz');
+      process.env.TEST7_BAR = 'foo';
+      underTest.renewAll(function (err) {
+        expect(err).toNotExist();
+        expect(underTest.get('test7', '#/bar')).toBe('foo');
+      });
+    });
+  });
 });

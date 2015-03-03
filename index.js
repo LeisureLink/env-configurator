@@ -12,22 +12,80 @@ module.exports = (function () {
       jptr = require('json-ptr'),
       assert = require('assert-plus'),
       getConfig = require('./lib/index.js'),
+      async = require('async'),
       appConfiguration = {},
       appConfigSpecs = {};
-
+  
   function validateClientConfig(configSpec, done) {
     jaySchema.validate(configSpec, schema, done);
   }
+  
+  function Configurator() { }
+  
+  /**
+   * Refreshes a specific configuration by config spec name from all valid configuration sources
+   * @param {string} context - The name of the config spec, specifically the 'name' property of the originally given configuration spec
+   * @param {configFulFilled} [configFulfilled] - An optional callback function that notifies the client when configuration work is complete
+   */
+  Object.defineProperty(Configurator.prototype, 'renew', {
+    value: function renew(context, configFulFilled) {
+      assert.optionalFunc(configFulFilled, 'configFulfilled');
+      if (appConfigSpecs[context]) {
+        getConfig(appConfigSpecs[context], function (err, config) {
+          if (!err) {
+            appConfiguration[context] = config;
+            if (configFulFilled) {
+              configFulFilled(null);
+            }
+          } else {
+            if (configFulFilled) {
+              configFulFilled(err);
+            }
+          }
+        });
+      }
+    }
+  });
 
-  function Configurator() { } 
-
-  function renew(context) {
-    //no-op
-  }
-
-  function renewAll() {
-    //no-op
-  }
+  
+  /**
+   * Refreshes the configurators existing configuration specs from all valid configuration sources
+   * @param {configFulFilled} [configFulfilled] - An optional callback function that notifies the client when configuration work is complete
+   */
+  Object.defineProperty(Configurator.prototype, 'renewAll', {
+    value: function renewAll(configFulfilled) {
+      assert.optionalFunc(configFulfilled, configFulfilled);
+      var propName,
+          taskList = [];
+      function makeTask(configSpec) {
+        return function (cb) {
+          getConfig(configSpec, function (err, config) {
+            if (!err) {
+              cb(null, { name: configSpec.name, value: config });
+            } else {
+              cb(err);
+            }
+          });
+        };
+      }
+      for (propName in appConfigSpecs) {
+        if (appConfigSpecs.hasOwnProperty(propName)) {
+          taskList.push(makeTask(appConfigSpecs[propName]));
+        }
+      }
+      async.parallel(taskList, function (err, config) {
+        var idx;
+        if (!err) {
+          for (idx = 0; idx < config.length; idx++) {
+            appConfiguration[config[idx].name] = config[idx].value;
+          } 
+          configFulfilled(null);
+        } else {
+          configFulfilled(err);
+        }
+      });
+    }
+  });
   
   /**
    * Returns a configuration property from a particular configuration context as identified by a JSON-ptr
@@ -39,7 +97,7 @@ module.exports = (function () {
   Object.defineProperty(Configurator.prototype, 'get', {
     value: function get(context, ptrStr) {
       assert.string(context, 'context');
-      assert.string(ptrStr, 'ptr');
+      assert.string(ptrStr, 'ptrStr');
       var ptr = jptr.create(ptrStr);
       return ptr.get(appConfiguration[context]);
     }
@@ -90,7 +148,7 @@ module.exports = (function () {
       });
     }
   });
-
+  
   return Configurator;
 
 })();
