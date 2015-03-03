@@ -11,16 +11,15 @@ module.exports = (function () {
       schema = require('./lib/configuration-schema.json'),
       jptr = require('json-ptr'),
       assert = require('assert-plus'),
-      getConfig = require('./lib/index.js');
-  
+      getConfig = require('./lib/index.js'),
+      appConfiguration = {},
+      appConfigSpecs = {};
+
   function validateClientConfig(configSpec, done) {
     jaySchema.validate(configSpec, schema, done);
   }
 
-  var Configurator = function () {
-    this.appConfiguration = {};
-    this.appConfigSpecs = {};
-  }
+  function Configurator() { } 
 
   function renew(context) {
     //no-op
@@ -40,9 +39,9 @@ module.exports = (function () {
   Object.defineProperty(Configurator.prototype, 'get', {
     value: function get(context, ptrStr) {
       assert.string(context, 'context');
-      assert.string(ptr, 'ptr');
-      var ptr = jptr.create(ptr);
-      return ptr.get(this.appConfiguration[context]);
+      assert.string(ptrStr, 'ptr');
+      var ptr = jptr.create(ptrStr);
+      return ptr.get(appConfiguration[context]);
     }
   });
   
@@ -55,7 +54,8 @@ module.exports = (function () {
 
   /**
    * Attempts to fulfill a client's configuration specification by retrieve configuration from various sources and making it
-   * available via the get method
+   * available via the get method. Note that only the first of multiple calls to this method with a configuration spec will be
+   * acted on, calls after the first will be ignored. To update an existing configuration call renewAll or renew('name')
    * @name module:env-configurator#configurator#fulfill
    * @param {object} configSpec - A config object described by the @{link file://lib/configuration-schema.json|the configurator's JSON schema}
    * @param {configFulfilled} [configFulfilled] - An optional callback function that will be called when successful configuration is complete or when an error is encountered
@@ -65,18 +65,23 @@ module.exports = (function () {
       assert.optionalFunc(configFulfilled, 'configFulfilled');
       validateClientConfig(configSpec, function (err) {
         if (!err) {
-          appConfigSpecs[configSpec.name] = configSpec;
-          if (!(configSpec.name in this.appConfiguration)) {
-            appConfiguration[configSpec.name] = {};
-          }
-          getConfig(configSpec, function (err, config) {
-            if (!err) {
+          if (!appConfigSpecs[configSpec.name]) {
+            appConfigSpecs[configSpec.name] = configSpec;
+            if (!(configSpec.name in appConfiguration)) {
               appConfiguration[configSpec.name] = {};
             }
-            if (configFulfilled) {
-              configFulfilled(err);
-            }
-          });
+            getConfig(configSpec, function (err, config) {
+              if (!err) {
+                appConfiguration[configSpec.name] = config;
+              }
+              if (configFulfilled) {
+                configFulfilled(err);
+              }
+            });
+          } else {
+            //for now we don't report being called with the same spec as an error
+            configFulfilled(null);
+          }
         } else {
           if (configFulfilled) {
             configFulfilled(err);
