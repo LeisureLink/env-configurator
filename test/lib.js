@@ -5,18 +5,27 @@ var expect = require('expect'),
     sandboxedModule = require('sandboxed-module'),
     underTest = sandboxedModule.require('../lib/index.js', {
       'requires' : {
-        './dns.js': function (configSpec, config, cb) {
-          var result = {},
-              service;
-          if (configSpec.services) {
-            for (service in configSpec.services) {
-              result[configSpec.services[service].name] = {};
-              result[configSpec.services[service].name].value = 'https://foo.example.com:443/bar';
-              result[configSpec.services[service].name].key = configSpec.services[service].key;
+/*        './d * ns.js': function (configSpec, config, cb) {*/
+/*          var result = {},*/
+/*              service;*/
+/*          if (configSpec.services) {*/
+/*            for (service in configSpec.services) {*/
+/*              result[configSpec.services[service].name] = {};*/
+/*              result[configSpec.services[service].name].value = 'https://foo.example.com:443/bar';*/
+/*              result[configSpec.services[service].name].key = configSpec.services[service].key;*/
+/*            }*/
+/*            cb(null, result);*/
+/*          } else {*/
+/*            cb(new AssertionError('test'), null);*/
+/*          }*/
+/*        } * ,*/
+        'dns': {
+          _validResults: [{ 'priority': 10, 'weight': 5, 'port': 443, 'name': 'foo.example.com' },
+            { 'priority': 20, 'weight': 5, 'port': 553, 'name': 'bar.example.com' }],
+          resolveSrv: function (hostname, callback) {
+            if (hostname === 'bar.services.local') {
+              callback(null, this._validResults);
             }
-            cb(null, result);
-          } else {
-            cb(new AssertionError('test'), null);
           }
         },
         'consul': function consulClient(options) {
@@ -150,7 +159,7 @@ describe('env-configurator lib', function () {
       expect(config.bar).toBe(undefined);
     });
   });
-
+  
   it('should allow the env configuration provider to override the consul config provider for KV pairs', function () {
     process.env.CONSUL_HOST = 'localhost';
     process.env.CONSUL_PORT = '234';
@@ -169,7 +178,7 @@ describe('env-configurator lib', function () {
       expect(config.bar).toBe(undefined);
     });
   });
-
+  
   it('should retrieve service configuration from the DNS if so configured', function () {
     underTest({
       name: 'TEST',
@@ -187,7 +196,7 @@ describe('env-configurator lib', function () {
       expect(config.foo.uri).toBe('https://foo.example.com:443/bar');
     });
   });
-
+  
   it('should retrieve service configuration from the DNS if so configured', function () {
     underTest({
       name: 'TEST',
@@ -205,7 +214,7 @@ describe('env-configurator lib', function () {
       expect(config.foo.uri).toBe('https://foo.example.com:443/bar');
     });
   });
-
+  
   it('should allow the service configuration from DNS to override env configuration', function () {
     process.env.TEST_FOO_URI = 'should_not_be_returned';
     
