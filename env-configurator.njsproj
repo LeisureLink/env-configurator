@@ -40,6 +40,10 @@
       <SubType>Code</SubType>
       <TestFramework>Mocha</TestFramework>
     </Compile>
+    <Compile Include="test\env-configurator.js">
+      <SubType>Code</SubType>
+      <TestFramework>Mocha</TestFramework>
+    </Compile>
     <Compile Include="test\formatters.js">
       <SubType>Code</SubType>
       <TestFramework>Mocha</TestFramework>
