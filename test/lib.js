@@ -188,27 +188,9 @@ describe('env-configurator lib', function () {
     });
   });
   
-  it('should retrieve service configuration from the DNS if so configured', function () {
-    underTest({
-      name: 'TEST',
-      services: [
-        {
-          name: 'foo.service.consul',
-          key: '#/foo/uri',
-          formatter: 'https'
-        }
-      ]
-    }, function (err, config) {
-      expect(err).toBe(null);
-      expect(config).toNotBe(null);
-      expect(config.foo).toNotBe(null);
-      expect(config.foo.uri).toBe('https://foo.example.com:443/bar');
-    });
-  });
-  
   it('should allow the service configuration from DNS to override env configuration', function () {
     process.env.TEST_FOO_URI = 'should_not_be_returned';
-    
+    process.env.TEST_NAME = 'bar'; 
     underTest({
       name: 'TEST',
       keys: [
@@ -218,7 +200,8 @@ describe('env-configurator lib', function () {
         {
           name: 'foo.service.consul',
           key: '#/foo/uri',
-          formatter: 'https'
+          formatter: 'https',
+          suffix: '#/name'
         }
       ]
     }, function (err, config) {
