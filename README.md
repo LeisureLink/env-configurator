@@ -14,6 +14,14 @@ and therefore **does not return** a configuration object. Instead, after indicat
 that configuration is complete, env-configurator makes configuration
 keys available via a #get function.
 
+## Notes & TODOs
+
+- Add logging support to the configurator in order to enable more transparent error handling
+- Refactor the DNS resolution module (lib\dns.js). I don't like the way errors are currently handled
+  and I really don't like how the module is dependent on having the app config passed to it for
+  prefix and suffix resolution and DNS fallback. This module is currently what prevents the configuration providers (Consul, Env, others?)
+  from being reordered.
+
 ## Installation
 
 Clone this repository and use npm to install dependencies.

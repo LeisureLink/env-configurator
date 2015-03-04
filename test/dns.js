@@ -52,7 +52,7 @@ describe('dns-configurator', function () {
           'formatter': 'http'
         }
       ]
-    }, {}, function (config) {
+    }, {}, function (err, config) {
       expect(config.foo).toNotExist('Config result should not contain names for which there was no result');
     });
   });
@@ -115,6 +115,27 @@ describe('dns-configurator', function () {
       expect(config['bar.services.local']).toExist("Config should have configuration property");
       expect(config['bar.services.local'].value).toBe('http://dev.bar.example.com:27017/');
       expect(config['bar.services.local'].key).toBe('#/bar/uri');
+    });
+  });
+
+  it('should fall back to pre-configured values from other providers if DNS configuration fails', function () {
+    getConfig({
+      'services': [
+        {
+          'name': 'not.provided.local',
+          'key': '#/bar/uri',
+          'formatter': 'http',
+          'suffix': '#/bar/name'
+        }
+      ]
+    }, {
+      'bar': {
+        'uri': 'http://backup.example.com/',
+        'name': 'hello'
+      }
+    }, function (err, config) {
+      expect(config['not.provided.local']).toExist();
+      expect(config['not.provided.local'].value).toBe('http://backup.example.com/hello');
     });
   });
 
