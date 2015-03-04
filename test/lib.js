@@ -5,26 +5,15 @@ var expect = require('expect'),
     sandboxedModule = require('sandboxed-module'),
     underTest = sandboxedModule.require('../lib/index.js', {
       'requires' : {
-/*        './d * ns.js': function (configSpec, config, cb) {*/
-/*          var result = {},*/
-/*              service;*/
-/*          if (configSpec.services) {*/
-/*            for (service in configSpec.services) {*/
-/*              result[configSpec.services[service].name] = {};*/
-/*              result[configSpec.services[service].name].value = 'https://foo.example.com:443/bar';*/
-/*              result[configSpec.services[service].name].key = configSpec.services[service].key;*/
-/*            }*/
-/*            cb(null, result);*/
-/*          } else {*/
-/*            cb(new AssertionError('test'), null);*/
-/*          }*/
-/*        } * ,*/
         'dns': {
-          _validResults: [{ 'priority': 10, 'weight': 5, 'port': 443, 'name': 'foo.example.com' },
-            { 'priority': 20, 'weight': 5, 'port': 553, 'name': 'bar.example.com' }],
+          _validResults: [{ 'priority': 10, 'weight': 9, 'port': 443, 'name': 'foo.example.com' },
+            { 'priority': 10, 'weight': 5, 'port': 553, 'name': 'bar.example.com' },
+            { 'priority': 20, 'weight': 5, 'port': 553, 'name': 'baz.example.com' }],
           resolveSrv: function (hostname, callback) {
-            if (hostname === 'bar.services.local') {
+            if (hostname === 'foo.service.consul') {
               callback(null, this._validResults);
+            } else {
+              callback(new Error('TEST'));
             }
           }
         },
@@ -180,13 +169,15 @@ describe('env-configurator lib', function () {
   });
   
   it('should retrieve service configuration from the DNS if so configured', function () {
+    process.env.TEST_NAME = 'bar';
     underTest({
       name: 'TEST',
       services: [
         {
           name: 'foo.service.consul',
           key: '#/foo/uri',
-          formatter: 'https'
+          formatter: 'https',
+          suffix: '#/name'
         }
       ]
     }, function (err, config) {
@@ -220,6 +211,9 @@ describe('env-configurator lib', function () {
     
     underTest({
       name: 'TEST',
+      keys: [
+            '#/foo/uri'
+      ],
       services: [
         {
           name: 'foo.service.consul',

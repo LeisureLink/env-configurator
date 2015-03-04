@@ -6,12 +6,15 @@ var expect = require('expect')
   , AssertionError = require('assert').AssertionError;
 var getConfig = sandboxedModule.require('../lib/dns.js', {
   requires: { 'dns': {
-        _validResults: [{ 'priority': 10, 'weight': 5, 'port': 27017, 'name': 'foo.example.com' },
-          { 'priority': 20, 'weight': 5, 'port': 27017, 'name': 'bar.example.com' }],
+      _validResults: [{ 'priority': 10, 'weight': 9, 'port': 27017, 'name': 'bar.example.com' },
+            { 'priority': 10, 'weight': 5, 'port': 553, 'name': 'bar.example.com' },
+            { 'priority': 20, 'weight': 5, 'port': 553, 'name': 'baz.example.com' }],
         resolveSrv: function (hostname, callback) {
           if (hostname === 'bar.services.local') {
             callback(null, this._validResults);
-          }
+        } else {
+          callback(new Error('Test'));
+        }
         }
     }}
 });
