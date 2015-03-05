@@ -1,6 +1,6 @@
 ﻿'use strict';
 /*jshint -W097*/
-/*global it: false, describe: false*/
+/*global it: false, describe: false, before: false*/
 var expect = require('expect'),
     UnderTest = require('../index.js');
 
@@ -96,6 +96,42 @@ describe('env-configurator', function () {
       underTest.renewAll(function (err) {
         expect(err).toNotExist();
         expect(underTest.get('test7', '#/bar')).toBe('foo');
+      });
+    });
+  });
+  
+  describe('namespacing', function () {
+    before('Create initial namespace', function (done) {
+      underTest = new UnderTest();
+      process.env.TEST8_BAR = 'baz';
+      underTest.fulfill({
+        "name": "test8",
+        "keys": [
+          "#/bar"
+        ]
+      }, function (errs) {
+        if (errs) {
+          throw new Error('Configurator test setup failed');
+        } else {
+          done();
+        }
+      });
+    });
+    
+    it('should separate different configuration specifications', function () {
+      process.env.TEST9_BAR = 'bar'; 
+      underTest.fulfill({
+        "name": "test9",
+        "keys": [
+          "#/bar"
+        ]
+      }, function (errs) {
+        if (errs) {
+          throw new Error('Configurator test setup failed');
+        } else {
+          expect(underTest.get('test8', '#/bar')).toBe('baz');
+          expect(underTest.get('test9', '#/bar')).toBe('bar');
+        }
       });
     });
   });
