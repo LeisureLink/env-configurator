@@ -6,10 +6,11 @@ var expect = require('expect'),
 
 describe('env-configurator', function () {
   var underTest;
-  it('should validate and reject poorly formed configuration requests', function () {
+  it('should validate and reject poorly formed configuration requests', function (done) {
     underTest = new UnderTest();
     underTest.fulfill({}, function (errs) {
       expect(errs).toExist();
+      done();
     });
   });
   
@@ -18,16 +19,17 @@ describe('env-configurator', function () {
     underTest.fulfill({});
   });
   
-  it('should gracefully handle a valid but empty configuration', function () {
+  it('should gracefully handle a valid but empty configuration', function (done) {
     underTest = new UnderTest();
     underTest.fulfill({
       "name": "test"
     }, function (errs) {
       expect(errs).toNotExist();
+      done();
     });
   });
 
-  it('should make keys from the environment available via the get call', function () {
+  it('should make keys from the environment available via the get call', function (done) {
     process.env.TEST3_FOO_BAZ = 'bar';
     underTest = new UnderTest();
     underTest.fulfill({
@@ -38,10 +40,11 @@ describe('env-configurator', function () {
     }, function (errs) {
       expect(errs).toNotExist();
       expect(underTest.get('test3', '#/foo/baz')).toBe('bar');
+      done();
     });
   });
 
-  it('should ensure that a config spec for a name cannot be changed after the first call', function () {
+  it('should ensure that a config spec for a name cannot be changed after the first call', function (done) {
     process.env.TEST5_FOO_BAZ = 'bar';
     underTest = new UnderTest();
     
@@ -58,11 +61,12 @@ describe('env-configurator', function () {
       }, function (errs) {
         expect(errs).toNotExist();
         expect(underTest.get('test5', '#/foo/baz')).toNotExist();
+        done();
       });
     });
   });
 
-  it('should renew an existing configuration if renew(name) is called', function () {
+  it('should renew an existing configuration if renew(name) is called', function (done) {
     process.env.TEST6_BAR = 'baz';
     underTest = new UnderTest();
     
@@ -77,11 +81,12 @@ describe('env-configurator', function () {
       underTest.renew('test6', function (err) {
         expect(err).toNotExist();
         expect(underTest.get('test6', '#/bar')).toBe('foo');
+        done();
       });
     });
   });
 
-  it('should renew an existing configuration if renewAll is called', function () {
+  it('should renew an existing configuration if renewAll is called', function (done) {
     process.env.TEST7_BAR = 'baz';
     underTest = new UnderTest();
     
@@ -96,6 +101,7 @@ describe('env-configurator', function () {
       underTest.renewAll(function (err) {
         expect(err).toNotExist();
         expect(underTest.get('test7', '#/bar')).toBe('foo');
+        done();
       });
     });
   });
@@ -118,7 +124,7 @@ describe('env-configurator', function () {
       });
     });
     
-    it('should separate different configuration specifications', function () {
+    it('should separate different configuration specifications', function (done) {
       process.env.TEST9_BAR = 'bar'; 
       underTest.fulfill({
         "name": "test9",
@@ -131,6 +137,7 @@ describe('env-configurator', function () {
         } else {
           expect(underTest.get('test8', '#/bar')).toBe('baz');
           expect(underTest.get('test9', '#/bar')).toBe('bar');
+          done();
         }
       });
     });
