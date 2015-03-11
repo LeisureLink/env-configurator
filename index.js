@@ -97,16 +97,27 @@ Object.defineProperty(Configurator.prototype, 'renewAll', {
  * Returns a configuration property from a particular configuration context as identified by a JSON-ptr
  * @name module:env-configurator~Configurator#get
  * @kind function
- * @param {string} context - The configurator context, this name corresponds to the configuration spec name
- * @param {string} ptrStr - A @{link http://tools.ietf.org/html/rfc6901|JSON ptr} string to the value the client needs
+ * @param {string|object} context - The configurator context, this name corresponds to the configuration spec name or a JSON ptr with the full config path
+ * including the context name as the first component
+ * @param {string} [ptrStr] - A @{link http://tools.ietf.org/html/rfc6901|JSON ptr} string to the value the client needs, if this parameter is missing it
+ * is assumed that the first param to the function is a valid {@link https://github.com/flitbit/json-ptr|json-ptr} object
  * @returns The requested value or undefined
  */
 Object.defineProperty(Configurator.prototype, 'get', {
   value: function get(context, ptrStr) {
-    assert.string(context, 'context');
-    assert.string(ptrStr, 'ptrStr');
-    var ptr = jptr.create(ptrStr);
-    return ptr.get(appConfiguration[context]);
+    assert.ok(context, 'context');
+    assert.optionalString(ptrStr, 'ptrStr');
+    var ptr,
+        retVal;
+    if (ptrStr) {
+      assert.string(context, 'context');
+      ptr = jptr.create(ptrStr);
+      retVal = ptr.get(appConfiguration[context]);
+    } else {
+      assert.object(context, 'context');
+      retVal = context.get(appConfiguration);
+    }
+    return retVal;
   }
 });
 
@@ -172,5 +183,5 @@ function getFulfillmentTask(configSpec) {
         }
       }
     });
-  }
+  };
 }

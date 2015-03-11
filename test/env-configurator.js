@@ -2,7 +2,8 @@
 /*jshint -W097*/
 /*global it: false, describe: false, before: false*/
 var expect = require('expect'),
-    UnderTest = require('../index.js');
+    UnderTest = require('../index.js'),
+    jptr = require('json-ptr');
 
 describe('env-configurator', function () {
   var underTest;
@@ -161,6 +162,21 @@ describe('env-configurator', function () {
         done();
       }
     });
-  })
+  });
+
+  it('should make configuration via a json-ptr get call', function (done) {
+    process.env.TEST12_FOO_BAZ = 'bar';
+    underTest = new UnderTest();
+    underTest.fulfill({
+      "name": "test12",
+      "keys": [
+        "#/foo/baz"
+      ]
+    }, function (errs) {
+      expect(errs).toNotExist();
+      expect(underTest.get(jptr.create('#/test12/foo/baz'))).toBe('bar');
+      done();
+    });
+  });
 
 });
