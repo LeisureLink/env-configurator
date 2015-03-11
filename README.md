@@ -69,6 +69,36 @@ configuration then a configuration key could be retrieved by calling:
 
 ```configuratorObj.get('mylib', '#/someapi/apikey');```
 
+### Optional keys
+
+Optional keys get a separate section because they're special. Optional
+keys should be used sparingly in order to avoid
+unintentionally placing default values in your application. That being
+said, sometimes it is useful to use the absence of a configuration key
+as a configuration parameter.
+
+Add an ```optional``` array in order to declare keys (defined in either 
+the services or keys array) as optional. The functionality of the
+```optional``` array is essentially the inverse of the ```required``` 
+array in a JSON Schema definition.
+
+Example:
+
+    {
+        "name": "myApp",
+        "keys": [
+            "#/foo"
+        ],
+        "optional": [
+            "#/foo"
+        ]
+    }
+
+In the above example if ```#/foo``` were missing **no errors** will 
+be thrown by the library during configuration. Any subsequent call
+to ```get('myApp', '#/foo')``` will return undefined.
+
+
 ## Lookup conventions
 
 In order to retrieve configuration keys the configurator uses a

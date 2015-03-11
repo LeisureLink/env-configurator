@@ -152,6 +152,23 @@ describe('env-configurator lib', function () {
     });
   });
   
+  it('should ignore missing keys that are declared as optional', function (done) {
+    
+    underTest({
+      name: 'TEST',
+      keys: [
+        '#/is/not/set'
+      ],
+      optional: [
+        '#/is/not/set'
+      ]
+    }, function (err, config) {
+      expect(err).toBe(null);
+      expect(config.is).toBe(undefined);
+      done();
+    });
+  });
+  
   it('should allow the env configuration provider to override the consul config provider for KV pairs', function (done) {
     process.env.CONSUL_HOST = 'localhost';
     process.env.CONSUL_PORT = '234';
