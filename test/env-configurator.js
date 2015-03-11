@@ -125,6 +125,7 @@ describe('env-configurator', function () {
     });
     
     it('should separate different configuration specifications', function (done) {
+      underTest = new UnderTest();
       process.env.TEST9_BAR = 'bar'; 
       underTest.fulfill({
         "name": "test9",
@@ -142,4 +143,24 @@ describe('env-configurator', function () {
       });
     });
   });
+
+  it('should fulfill config specifications passed as an array', function (done) {
+    underTest = new UnderTest();
+    process.env.TEST10_BAR = 'bar';
+    process.env.TEST11_FOO = 'foo';
+    
+    underTest.fulfill([
+      { "name": "test10", "keys": ["#/bar"] },
+      { "name": "test11", "keys": ["#/foo"] }
+    ], function (errs) {
+      if (errs) {
+        throw new Error('Configurator test setup failed');
+      } else {
+        expect(underTest.get('test10', '#/bar')).toBe('bar');
+        expect(underTest.get('test11', '#/foo')).toBe('foo');
+        done();
+      }
+    });
+  })
+
 });
