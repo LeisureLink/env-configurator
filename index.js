@@ -1,29 +1,33 @@
-﻿module.exports = (function () {
-  'use strict';
-  var JaySchema = require('jayschema'),
-      jaySchema = new JaySchema(),
-      schema = require('./lib/configuration-schema.json'),
-      jptr = require('json-ptr'),
-      assert = require('assert-plus'),
-      getConfig = require('./lib/index.js'),
-      async = require('async'),
-      appConfiguration = {},
-      appConfigSpecs = {};
-  
-  function validateClientConfig(configSpec, done) {
-    jaySchema.validate(configSpec, schema, done);
-  }
-  
-  /**
+﻿'use strict';
+var JaySchema = require('jayschema'),
+    jaySchema = new JaySchema(),
+    schema = require('./lib/configuration-schema.json'),
+    jptr = require('json-ptr'),
+    assert = require('assert-plus'),
+    getConfig = require('./lib/index.js'),
+    async = require('async'),
+    appConfiguration = {},
+    appConfigSpecs = {};
+/**
+ * @module env-configurator
+ */
+module.exports = Configurator;
+
+function validateClientConfig(configSpec, done) {
+  jaySchema.validate(configSpec, schema, done);
+}
+
+/**
    * Creates a configurator object
-   * @name module:env-configurator
    * @constructor
    */
   function Configurator() { }
   
+  
   /**
    * Refreshes a specific configuration by config spec name from all valid configuration sources
-   * @name module:env-configurator#renew
+   * @name module:env-configurator~Configurator#renew
+   * @kind function
    * @param {string} context - The name of the config spec, specifically the 'name' property of the originally given configuration spec
    * @param {configFulFilled} [configFulfilled] - An optional callback function that notifies the client when configuration work is complete
    */
@@ -46,11 +50,12 @@
       }
     }
   });
-
+  
   
   /**
    * Refreshes the configurators existing configuration specs from all valid configuration sources
-   * @name module:env-configurator#renewAll
+   * @name module:env-configurator~Configurator#renewAll
+   * @kind function
    * @param {configFulFilled} [configFulfilled] - An optional callback function that notifies the client when configuration work is complete
    */
   Object.defineProperty(Configurator.prototype, 'renewAll', {
@@ -79,7 +84,7 @@
         if (!err) {
           for (idx = 0; idx < config.length; idx++) {
             appConfiguration[config[idx].name] = config[idx].value;
-          } 
+          }
           configFulfilled(null);
         } else {
           configFulfilled(err);
@@ -90,7 +95,8 @@
   
   /**
    * Returns a configuration property from a particular configuration context as identified by a JSON-ptr
-   * @name module:env-configurator#get
+   * @name module:env-configurator~Configurator#get
+   * @kind function
    * @param {string} context - The configurator context, this name corresponds to the configuration spec name
    * @param {string} ptrStr - A @{link http://tools.ietf.org/html/rfc6901|JSON ptr} string to the value the client needs
    * @returns The requested value or undefined
@@ -115,7 +121,8 @@
    * Attempts to fulfill a client's configuration specification by retrieve configuration from various sources and making it
    * available via the get method. Note that only the first of multiple calls to this method with a configuration spec will be
    * acted on, calls after the first will be ignored. To update an existing configuration call renewAll or renew('name')
-   * @name module:env-configurator#fulfill
+   * @name module:env-configurator~Configurator#fulfill
+   * @kind function
    * @param {object} configSpec - A config object described by the @{link file://lib/configuration-schema.json|the configurator's JSON schema}
    * @param {configFulfilled} [configFulfilled] - An optional callback function that will be called when successful configuration is complete or when an error is encountered
    */
@@ -149,7 +156,3 @@
       });
     }
   });
-  
-  return Configurator;
-
-})();
