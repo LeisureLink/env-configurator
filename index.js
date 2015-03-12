@@ -82,7 +82,6 @@ Object.defineProperty(Configurator.prototype, 'renewAll', {
     async.parallel(taskList, function (err, config) {
       var idx;
       if (!err) {
-        debugger;
         for (idx = 0; idx < config.length; idx++) {
           appConfiguration[config[idx].name] = config[idx].value;
         }
