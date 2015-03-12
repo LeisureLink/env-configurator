@@ -99,7 +99,7 @@ describe('env-configurator lib', function () {
     });
   });
   
-  it('should correctly retrieve a single variable from the environment', function () {
+  it('should correctly retrieve a single variable from the environment', function (done) {
     process.env.TEST_ME = 'foobar';
     underTest({
       name: 'TEST',
@@ -110,10 +110,11 @@ describe('env-configurator lib', function () {
       expect(err).toBe(null);
       expect(config).toNotBe(null);
       expect(config.me).toBe('foobar');
+      done();
     });
   });
   
-  it('should correctly retrieve multiple multi-leveled variables from the environment', function () {
+  it('should correctly retrieve multiple multi-leveled variables from the environment', function (done) {
     process.env.TEST_ME = 'foobar';
     process.env.TEST_BAR_BAZ = 'foobar';
     underTest({
@@ -128,10 +129,11 @@ describe('env-configurator lib', function () {
       expect(config.me).toBe('foobar');
       expect(config.bar).toExist();
       expect(config.bar.baz).toBe('foobar');
+      done();
     });
   });
   
-  it('should correctly retrieve a single variable from consul', function () {
+  it('should correctly retrieve a single variable from consul', function (done) {
     process.env.CONSUL_HOST = 'localhost';
     process.env.CONSUL_PORT = '234';
     process.env.CONSUL_SECURE = true;
@@ -146,10 +148,28 @@ describe('env-configurator lib', function () {
       expect(config).toNotBe(null);
       expect(config.foo).toBe('dGVzdA==');
       expect(config.bar).toBe(undefined);
+      done();
     });
   });
   
-  it('should allow the env configuration provider to override the consul config provider for KV pairs', function () {
+  it('should ignore missing keys that are declared as optional', function (done) {
+    
+    underTest({
+      name: 'TEST',
+      keys: [
+        '#/is/not/set'
+      ],
+      optional: [
+        '#/is/not/set'
+      ]
+    }, function (err, config) {
+      expect(err).toBe(null);
+      expect(config.is).toBe(undefined);
+      done();
+    });
+  });
+  
+  it('should allow the env configuration provider to override the consul config provider for KV pairs', function (done) {
     process.env.CONSUL_HOST = 'localhost';
     process.env.CONSUL_PORT = '234';
     process.env.CONSUL_SECURE = true;
@@ -165,10 +185,11 @@ describe('env-configurator lib', function () {
       expect(config).toNotBe(null);
       expect(config.foo).toBe('foobar');
       expect(config.bar).toBe(undefined);
+      done();
     });
   });
   
-  it('should retrieve service configuration from the DNS if so configured', function () {
+  it('should retrieve service configuration from the DNS if so configured', function (done) {
     process.env.TEST_NAME = 'bar';
     underTest({
       name: 'TEST',
@@ -185,10 +206,11 @@ describe('env-configurator lib', function () {
       expect(config).toNotBe(null);
       expect(config.foo).toNotBe(null);
       expect(config.foo.uri).toBe('https://foo.example.com:443/bar');
+      done();
     });
   });
   
-  it('should allow the service configuration from DNS to override env configuration', function () {
+  it('should allow the service configuration from DNS to override env configuration', function (done) {
     process.env.TEST_FOO_URI = 'should_not_be_returned';
     process.env.TEST_NAME = 'bar'; 
     underTest({
@@ -209,6 +231,7 @@ describe('env-configurator lib', function () {
       expect(config).toNotBe(null);
       expect(config.foo).toNotBe(null);
       expect(config.foo.uri).toBe('https://foo.example.com:443/bar');
+      done();
     });
   });
 });

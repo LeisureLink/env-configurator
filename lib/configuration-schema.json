@@ -45,6 +45,13 @@
                 },
                 "required": [ "name", "key" ]
             }
+        },
+        "optional": {
+            "type": "array",
+            "description": "An array of keys which are defined above in services or 'keys' which are optional (may be null)",
+            "items": { 
+                "type": "string"
+            }
         }
     },
     "required": ["name"]
