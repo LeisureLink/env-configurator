@@ -60,7 +60,7 @@ Object.defineProperty(Configurator.prototype, 'renew', {
  */
 Object.defineProperty(Configurator.prototype, 'renewAll', {
   value: function renewAll(configFulfilled) {
-    assert.optionalFunc(configFulfilled, configFulfilled);
+    assert.optionalFunc(configFulfilled, 'configFulfilled');
     var propName,
         taskList = [];
     function makeTask(configSpec) {
@@ -82,6 +82,7 @@ Object.defineProperty(Configurator.prototype, 'renewAll', {
     async.parallel(taskList, function (err, config) {
       var idx;
       if (!err) {
+        debugger;
         for (idx = 0; idx < config.length; idx++) {
           appConfiguration[config[idx].name] = config[idx].value;
         }
