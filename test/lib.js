@@ -6,12 +6,15 @@ var expect = require('expect'),
     underTest = sandboxedModule.require('../lib/index.js', {
       'requires' : {
         'dns': {
-          _validResults: [{ 'priority': 10, 'weight': 9, 'port': 443, 'name': 'foo.example.com' },
-            { 'priority': 10, 'weight': 5, 'port': 553, 'name': 'bar.example.com' },
-            { 'priority': 20, 'weight': 5, 'port': 553, 'name': 'baz.example.com' }],
           resolveSrv: function (hostname, callback) {
             if (hostname === 'foo.service.consul') {
-              callback(null, this._validResults);
+              setTimeout(function () {
+                callback(null, 
+                [{ 'priority': 10, 'weight': 9, 'port': 443, 'name': 'foo.example.com' },
+            { 'priority': 10, 'weight': 5, 'port': 553, 'name': 'bar.example.com' },
+            { 'priority': 20, 'weight': 5, 'port': 553, 'name': 'baz.example.com' }]);
+              }
+            , 250);
             } else {
               callback(new Error('TEST'));
             }
@@ -21,26 +24,29 @@ var expect = require('expect'),
           return {
             'kv': {
               'get': function (options, cb) {
-                cb(null, [
-                  {
-                    "CreateIndex": 100,
-                    "ModifyIndex": 200,
-                    "LockIndex": 200,
-                    "Key": options.key + "foo",
-                    "Flags": 0,
-                    "Value": "dGVzdA==",
-                    "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
-                  },
-                  {
-                    "CreateIndex": 100,
-                    "ModifyIndex": 200,
-                    "LockIndex": 200,
-                    "Key": options.key + "bar",
-                    "Flags": 0,
-                    "Value": "dGVzdA==asd",
-                    "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
-                  }
-                ]);
+                setTimeout(
+                  function () {
+                    cb(null, [
+                      {
+                        "CreateIndex": 100,
+                        "ModifyIndex": 200,
+                        "LockIndex": 200,
+                        "Key": options.key + "foo",
+                        "Flags": 0,
+                        "Value": "dGVzdA==",
+                        "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
+                      },
+                      {
+                        "CreateIndex": 100,
+                        "ModifyIndex": 200,
+                        "LockIndex": 200,
+                        "Key": options.key + "bar",
+                        "Flags": 0,
+                        "Value": "dGVzdA==asd",
+                        "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
+                      }
+                    ]);
+                  }, 250);
               }
             }
           };
@@ -81,13 +87,14 @@ describe('env-configurator lib', function () {
     }
   });
   
-  it('should gracefully do nothing if given an empty config', function () {
+  it('should gracefully do nothing if given an empty config', function (done) {
     underTest({}, function (err, config) {
       expect(config).toNotBe(null);
+      done();
     });
   });
   
-  it('should return errors when requested config keys are not fulfilled', function () {
+  it('should return errors when requested config keys are not fulfilled', function (done) {
     underTest({
       name: 'TEST',
       keys: [
@@ -95,7 +102,7 @@ describe('env-configurator lib', function () {
       ]
     }, function (err, config) {
       expect(err).toNotBe(null);
-    
+      done(); 
     });
   });
   
