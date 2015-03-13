@@ -12,7 +12,7 @@ var expect = require('expect'),
                 callback(null, 
                 [{ 'priority': 10, 'weight': 9, 'port': 443, 'name': 'foo.example.com' },
             { 'priority': 10, 'weight': 5, 'port': 553, 'name': 'bar.example.com' },
-            { 'priority': 20, 'weight': 5, 'port': 553, 'name': 'baz.example.com' }])
+            { 'priority': 20, 'weight': 5, 'port': 553, 'name': 'baz.example.com' }]);
               }
             , 250);
             } else {
@@ -45,7 +45,7 @@ var expect = require('expect'),
                         "Value": "dGVzdA==asd",
                         "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
                       }
-                    ])
+                    ]);
                   }, 250);
               }
             }
