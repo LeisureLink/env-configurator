@@ -63,20 +63,9 @@ Object.defineProperty(Configurator.prototype, 'renewAll', {
     assert.optionalFunc(configFulfilled, 'configFulfilled');
     var propName,
         taskList = [];
-    function makeTask(configSpec) {
-      return function (cb) {
-        getConfig(configSpec, function (err, config) {
-          if (!err) {
-            cb(null, { name: configSpec.name, value: config });
-          } else {
-            cb(err);
-          }
-        });
-      };
-    }
     for (propName in appConfigSpecs) {
       if (appConfigSpecs.hasOwnProperty(propName)) {
-        taskList.push(makeTask(appConfigSpecs[propName]));
+        taskList.push(makeRenewTask(appConfigSpecs[propName]));
       }
     }
     async.parallel(taskList, function (err, config) {
@@ -92,6 +81,18 @@ Object.defineProperty(Configurator.prototype, 'renewAll', {
     });
   }
 });
+
+function makeRenewTask(configSpec) {
+  return function task(cb) {
+    getConfig(configSpec, function (err, config) {
+      if (!err) {
+        cb(null, { name: configSpec.name, value: config });
+      } else {
+        cb(err);
+      }
+    });
+  };
+}
 
 /**
  * Returns a configuration property from a particular configuration context as identified by a JSON-ptr
