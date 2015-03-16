@@ -1,6 +1,6 @@
 {
   "name": "env-configurator",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Configuration library that attempts to get configuration based on environment variables, Consul.io KV stores, and DNS SRV records",
   "main": "index.js",
   "author": {
