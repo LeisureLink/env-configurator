@@ -7,7 +7,8 @@ var JaySchema = require('jayschema'),
     getConfig = require('./lib/index.js'),
     async = require('async'),
     appConfiguration = {},
-    appConfigSpecs = {};
+    appConfigSpecs = {},
+    looksLikeJSONPtr = new RegExp('^[#/]');
 /**
  * @module env-configurator
  */
@@ -98,25 +99,44 @@ function makeRenewTask(configSpec) {
  * Returns a configuration property from a particular configuration context as identified by a JSON-ptr
  * @name module:env-configurator~Configurator#get
  * @kind function
- * @param {string|object} context - The configurator context, this name corresponds to the configuration spec name or a JSON ptr with the full config path
+ * @param {string} context - The configurator context, this name corresponds to the configuration spec name or a JSON ptr with the full config path
  * including the context name as the first component
  * @param {string} [ptrStr] - A @{link http://tools.ietf.org/html/rfc6901|JSON ptr} string to the value the client needs, if this parameter is missing it
  * is assumed that the first param to the function is a valid {@link https://github.com/flitbit/json-ptr|json-ptr} object
  * @returns The requested value or undefined
+ * @throws {Error} Throws an error if the given arguments are invalid or if the arguments were valid but reference an undefined key which was not explicitly marked
+ * as optional
  */
 Object.defineProperty(Configurator.prototype, 'get', {
   value: function get(context, ptrStr) {
-    assert.ok(context, 'context');
+    assert.string(context, 'context');
     assert.optionalString(ptrStr, 'ptrStr');
     var ptr,
-        retVal;
+        retVal,
+        useFullPathPointer = false;
     if (ptrStr) {
-      assert.string(context, 'context');
       ptr = jptr.create(ptrStr);
       retVal = ptr.get(appConfiguration[context]);
+    } else if (looksLikeJSONPtr.test(context)) {
+      retVal = jptr.create(context).get(appConfiguration);
+      useFullPathPointer = true;
     } else {
-      assert.object(context, 'context');
-      retVal = context.get(appConfiguration);
+      throw new Error('Given context "'.concat(context, '" and ptr "', ptrStr, '" that cannot be used'));
+    }
+    //check for missing keys or namespaces and throw Error if needed
+    if (retVal === undefined && !useFullPathPointer) {
+      if (!appConfigSpecs[context] || !appConfigSpecs[context].optional || appConfigSpecs[context].optional.indexOf(ptrStr) === -1) {
+        throw new Error('Given context "'.concat(context, '" and ptr "', ptrStr, '" that were not marked as optional'));
+      }
+    } else if (retVal === undefined) {
+      //if we get here then the passed 'context' was a valid json pointer
+      var idxOfSecondSlash = context.indexOf('/', 2);
+      var firstComponent = context.substring(0, idxOfSecondSlash);
+      var appSpec = jptr.create(firstComponent).get(appConfigSpecs);
+      var keyName = '#' + context.substring(idxOfSecondSlash);
+      if (!appSpec || !appSpec.optional || appSpec.optional.indexOf(keyName) === -1) {
+        throw new Error('Given context "'.concat(context, '" and ptr "', ptrStr, '" that were not marked as optional'));
+      }
     }
     return retVal;
   }
