@@ -145,4 +145,25 @@ describe('dns-configurator', function () {
     });
   });
 
+  it('should handle fall back values which are missing trailing slashes, env-configurator issue #7 ', function (done) {
+    getConfig({
+      'services': [
+        {
+          'name': 'not.provided.local',
+          'key': '#/bar/uri',
+          'formatter': 'http',
+          'suffix': '#/bar/name'
+        }
+      ]
+    }, {
+      'bar': {
+        'uri': 'http://backup.example.com',
+        'name': 'hello'
+      }
+    }, function (err, config) {
+      expect(config['not.provided.local']).toExist();
+      expect(config['not.provided.local'].value).toBe('http://backup.example.com/hello');
+      done();
+    });
+  });
 });
