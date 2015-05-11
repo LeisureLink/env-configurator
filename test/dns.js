@@ -153,16 +153,38 @@ describe('dns-configurator', function () {
           'key': '#/bar/uri',
           'formatter': 'http',
           'suffix': '#/bar/name'
+        },
+        {
+          'name': 'other.provided.local',
+          'key': '#/baz/uri',
+          'formatter': 'http',
+          'suffix': '#/baz/name'
+        },
+        {
+          'name': 'complete.provided.local',
+          'key': '#/foo/uri',
+          'formatter': 'http'
         }
       ]
     }, {
       'bar': {
         'uri': 'http://backup.example.com',
         'name': 'hello'
+      },
+      'baz': {
+        'uri':  'http://backup.example.com',
+        'name': '/hello'
+      },
+      'foo': {
+        'uri': 'http://backup3.example.com'
       }
     }, function (err, config) {
       expect(config['not.provided.local']).toExist();
       expect(config['not.provided.local'].value).toBe('http://backup.example.com/hello');
+      expect(config['other.provided.local']).toExist();
+      expect(config['other.provided.local'].value).toBe('http://backup.example.com/hello');
+      expect(config['complete.provided.local'].value).toExist();
+      expect(config['complete.provided.local'].value).toBe('http://backup3.example.com');
       done();
     });
   });
