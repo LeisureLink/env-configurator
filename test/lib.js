@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 /*jshint -W097*/
 /*global it: false, describe: false*/
 var expect = require('expect'),
@@ -9,7 +9,7 @@ var expect = require('expect'),
           resolveSrv: function (hostname, callback) {
             if (hostname === 'foo.service.consul') {
               setTimeout(function () {
-                callback(null, 
+                callback(null,
                 [{ 'priority': 10, 'weight': 9, 'port': 443, 'name': 'foo.example.com' },
             { 'priority': 10, 'weight': 5, 'port': 553, 'name': 'bar.example.com' },
             { 'priority': 20, 'weight': 5, 'port': 553, 'name': 'baz.example.com' }]);
@@ -71,7 +71,7 @@ describe('env-configurator lib', function () {
       expect(err instanceof AssertionError).toBe(true);
     }
   });
-  
+
   it('should throw an error if given an undefined callback function', function () {
     try {
       underTest({}, null);
@@ -86,14 +86,14 @@ describe('env-configurator lib', function () {
       expect(err instanceof AssertionError).toBe(true);
     }
   });
-  
+
   it('should gracefully do nothing if given an empty config', function (done) {
     underTest({}, function (err, config) {
       expect(config).toNotBe(null);
       done();
     });
   });
-  
+
   it('should return errors when requested config keys are not fulfilled', function (done) {
     underTest({
       name: 'TEST',
@@ -102,10 +102,10 @@ describe('env-configurator lib', function () {
       ]
     }, function (err, config) {
       expect(err).toNotBe(null);
-      done(); 
+      done();
     });
   });
-  
+
   it('should correctly retrieve a single variable from the environment', function (done) {
     process.env.TEST_ME = 'foobar';
     underTest({
@@ -120,9 +120,10 @@ describe('env-configurator lib', function () {
       done();
     });
   });
-  
+
   it('should correctly retrieve multiple multi-leveled variables from the environment', function (done) {
     process.env.TEST_ME = 'foobar';
+    process.env.BAR_BAZ = 'barfoo';
     process.env.TEST_BAR_BAZ = 'foobar';
     underTest({
       name: 'TEST',
@@ -139,12 +140,32 @@ describe('env-configurator lib', function () {
       done();
     });
   });
-  
+
+  it('should correctly retrieve global variables from the environment', function (done) {
+    process.env.TEST_ME = 'foobar';
+    process.env.BAR_BAZ = 'barfoo';
+    delete process.env.TEST_BAR_BAZ;
+    underTest({
+      name: 'TEST',
+      keys: [
+        '#/me',
+        '#/bar/baz'
+      ]
+    }, function (err, config) {
+      expect(err).toBe(null);
+      expect(config).toNotBe(null);
+      expect(config.me).toBe('foobar');
+      expect(config.bar).toExist();
+      expect(config.bar.baz).toBe('barfoo');
+      done();
+    });
+  });
+
   it('should correctly retrieve a single variable from consul', function (done) {
     process.env.CONSUL_HOST = 'localhost';
     process.env.CONSUL_PORT = '234';
     process.env.CONSUL_SECURE = true;
-    
+
     underTest({
       name: 'TEST',
       keys: [
@@ -158,9 +179,9 @@ describe('env-configurator lib', function () {
       done();
     });
   });
-  
+
   it('should ignore missing keys that are declared as optional', function (done) {
-    
+
     underTest({
       name: 'TEST',
       keys: [
@@ -175,13 +196,13 @@ describe('env-configurator lib', function () {
       done();
     });
   });
-  
+
   it('should allow the env configuration provider to override the consul config provider for KV pairs', function (done) {
     process.env.CONSUL_HOST = 'localhost';
     process.env.CONSUL_PORT = '234';
     process.env.CONSUL_SECURE = true;
     process.env.TEST_FOO = 'foobar';
-    
+
     underTest({
       name: 'TEST',
       keys: [
@@ -195,7 +216,7 @@ describe('env-configurator lib', function () {
       done();
     });
   });
-  
+
   it('should retrieve service configuration from the DNS if so configured', function (done) {
     process.env.TEST_NAME = 'bar';
     underTest({
@@ -216,10 +237,10 @@ describe('env-configurator lib', function () {
       done();
     });
   });
-  
+
   it('should allow the service configuration from DNS to override env configuration', function (done) {
     process.env.TEST_FOO_URI = 'should_not_be_returned';
-    process.env.TEST_NAME = 'bar'; 
+    process.env.TEST_NAME = 'bar';
     underTest({
       name: 'TEST',
       keys: [

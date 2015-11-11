@@ -1,11 +1,11 @@
 {
   "name": "env-configurator",
-  "version": "0.2.6",
+  "version": "0.3.0",
   "description": "Configuration library that attempts to get configuration based on environment variables, Consul.io KV stores, and DNS SRV records",
   "main": "index.js",
   "author": {
-    "email": "mhughes@leisurelink.com",
-    "name": "Michael Hughes"
+    "email": "techteam@leisurelink.com",
+    "name": "LeisureLink Tech"
   },
   "scripts": {
     "test": "mocha -R spec",
