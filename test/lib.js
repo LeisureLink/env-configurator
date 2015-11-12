@@ -26,26 +26,56 @@ var expect = require('expect'),
               'get': function (options, cb) {
                 setTimeout(
                   function () {
-                    cb(null, [
-                      {
-                        "CreateIndex": 100,
-                        "ModifyIndex": 200,
-                        "LockIndex": 200,
-                        "Key": options.key + "foo",
-                        "Flags": 0,
-                        "Value": "dGVzdA==",
-                        "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
-                      },
-                      {
-                        "CreateIndex": 100,
-                        "ModifyIndex": 200,
-                        "LockIndex": 200,
-                        "Key": options.key + "bar",
-                        "Flags": 0,
-                        "Value": "dGVzdA==asd",
-                        "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
-                      }
-                    ]);
+                    cb(null, options.key == "shared/"
+                      ? [
+                        {
+                          "CreateIndex": 100,
+                          "ModifyIndex": 200,
+                          "LockIndex": 200,
+                          "Key": "shared/overridden",
+                          "Flags": 0,
+                          "Value": "shared-value-to-be-overridden",
+                          "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
+                        },
+                        {
+                          "CreateIndex": 100,
+                          "ModifyIndex": 200,
+                          "LockIndex": 200,
+                          "Key": "shared/notoverridden",
+                          "Flags": 0,
+                          "Value": "shared-value",
+                          "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
+                        }
+                      ]
+                      : [
+                        {
+                          "CreateIndex": 100,
+                          "ModifyIndex": 200,
+                          "LockIndex": 200,
+                          "Key": options.key + "foo",
+                          "Flags": 0,
+                          "Value": "dGVzdA==",
+                          "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
+                        },
+                        {
+                          "CreateIndex": 100,
+                          "ModifyIndex": 200,
+                          "LockIndex": 200,
+                          "Key": "shared/overridden",
+                          "Flags": 0,
+                          "Value": "value-that-has-been-overridden",
+                          "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
+                        },
+                        {
+                          "CreateIndex": 100,
+                          "ModifyIndex": 200,
+                          "LockIndex": 200,
+                          "Key": options.key + "bar",
+                          "Flags": 0,
+                          "Value": "dGVzdA==asd",
+                          "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
+                        }
+                      ]);
                   }, 250);
               }
             }
@@ -176,6 +206,42 @@ describe('env-configurator lib', function () {
       expect(config).toNotBe(null);
       expect(config.foo).toBe('dGVzdA==');
       expect(config.bar).toBe(undefined);
+      done();
+    });
+  });
+
+  it('should correctly retrieve a shared variable from consul', function (done) {
+    process.env.CONSUL_HOST = 'localhost';
+    process.env.CONSUL_PORT = '234';
+    process.env.CONSUL_SECURE = true;
+
+    underTest({
+      name: 'TEST',
+      keys: [
+        '#/notoverridden'
+      ]
+    }, function (err, config) {
+      expect(err).toBe(null);
+      expect(config).toNotBe(null);
+      expect(config.notoverridden).toBe("shared-value");
+      done();
+    });
+  });
+
+  it('should correctly retrieve an overridden variable from consul', function (done) {
+    process.env.CONSUL_HOST = 'localhost';
+    process.env.CONSUL_PORT = '234';
+    process.env.CONSUL_SECURE = true;
+
+    underTest({
+      name: 'TEST',
+      keys: [
+        '#/overridden'
+      ]
+    }, function (err, config) {
+      expect(err).toBe(null);
+      expect(config).toNotBe(null);
+      expect(config.overridden).toBe("value-that-has-been-overridden");
       done();
     });
   });
