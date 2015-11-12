@@ -26,8 +26,8 @@ var expect = require('expect'),
               'get': function (options, cb) {
                 setTimeout(
                   function () {
-                    cb(null, options.key == "shared/"
-                      ? [
+                    cb(null, options.key == "shared/" ?
+                      [
                         {
                           "CreateIndex": 100,
                           "ModifyIndex": 200,
@@ -46,8 +46,8 @@ var expect = require('expect'),
                           "Value": "shared-value",
                           "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
                         }
-                      ]
-                      : [
+                      ] :
+                      [
                         {
                           "CreateIndex": 100,
                           "ModifyIndex": 200,
