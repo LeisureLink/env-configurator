@@ -7,3 +7,8 @@ node_modules
 *.cmd
 coverage.html
 /documentation
+coverage
+.idea/
+.settings/
+*-compiled/
+*.sln
