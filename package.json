@@ -22,6 +22,7 @@
   "dependencies": {
     "async": "^0.9.2",
     "consul": "^0.12.0",
+    "debug": "^2.2.0",
     "jayschema": "^0.3.1",
     "json-ptr": "^0.2.0"
   },
@@ -35,7 +36,6 @@
     "istanbul": "^0.4.1",
     "mocha": "^2.3.4",
     "sandboxed-module": "^2.0.0",
-    "sinon": "^1.12.2",
-    "updatr": "^0.1.1"
+    "sinon": "^1.12.2"
   }
 }
