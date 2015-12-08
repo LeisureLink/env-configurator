@@ -1,4 +1,3 @@
-'use strict';
 import Debug from 'debug';
 /**
   * Takes in a module name so the debug logs can output namespaced logging

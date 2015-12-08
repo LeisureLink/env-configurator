@@ -1,5 +1,4 @@
 var resolveSrv = require('./dns.js'),
-    EventEmitter = require('events').EventEmitter,
     jptr = require('json-ptr'),
     assert = require('assert-plus'),
     async = require('async');
@@ -8,12 +7,10 @@ var resolveSrv = require('./dns.js'),
 * @module lib
 */
 module.exports =(function () {
-  'use strict';
 
   var CONSUL_HOST = 'CONSUL_HOST',
       CONSUL_PORT = 'CONSUL_PORT',
       CONSUL_SECURE = 'CONSUL_SECURE',
-      ee = new EventEmitter(),
       matchSlashGreedy = new RegExp('/', 'g');
 
   /**
@@ -30,6 +27,26 @@ module.exports =(function () {
     //to be used with 'bind()'
     /*jshint validthis:true */
     return val.key === this || val.prefix === this || val.suffix === this;
+  }
+  /**
+   * Ensure object path is a small utility function for use with JSON pointers that ensures a particular pointer path
+   * exists in an object. The function is non-destructive and only creates a path component as necessary.
+   * @param {object} object - A JSON object to ensure that a particular pointer path exists in
+   * @param {object} ptr - A {@link https://github.com/flitbit/json-ptr|JSON pointer object}
+   */
+  function ensureObjPath(object, ptr) {
+    var cursor = object,
+        currentName,
+        idx,
+        pathAry = ptr.path;
+    for (idx = 0; idx < pathAry.length; idx++) {
+      currentName = pathAry[idx];
+      if (!cursor[currentName]) {
+        cursor[currentName] = {};
+      }
+      cursor = cursor[currentName];
+    }
+
   }
 
   /**
@@ -54,32 +71,11 @@ module.exports =(function () {
   }
 
   /**
-   * Ensure object path is a small utility function for use with JSON pointers that ensures a particular pointer path
-   * exists in an object. The function is non-destructive and only creates a path component as necessary.
-   * @param {object} object - A JSON object to ensure that a particular pointer path exists in
-   * @param {object} ptr - A {@link https://github.com/flitbit/json-ptr|JSON pointer object}
-   */
-  function ensureObjPath(object, ptr) {
-    var cursor = object,
-        currentName,
-        idx,
-        pathAry = ptr.path;
-    for (idx = 0; idx < pathAry.length; idx++) {
-      currentName = pathAry[idx];
-      if (!cursor[currentName]) {
-        cursor[currentName] = {};
-      }
-      cursor = cursor[currentName];
-    }
-
-  }
-
-  /**
    * Determines if we should use a consul agent to add configuration
    * @param {object} configurationRequest - A configuration request object that may contain information required to contact a consul agent
    * @returns {object} A reference to an active consule agent if one could be configured, undefined otherwise
    */
-  function setupConsul(configRequest) {
+  function setupConsul() {
     //client must fully specify how we will talk to consul
     var consulClient,
         consulHost = process.env[CONSUL_HOST],
@@ -110,7 +106,6 @@ module.exports =(function () {
     return function processKeyValuePairsInConsul(callback) {
       var requestedKeys = configRequest.keys,
           requestedServices = configRequest.services,
-          requestedKey,
           pathPrefixIdx,
           resultIdx,
           result,
@@ -259,8 +254,7 @@ module.exports =(function () {
    * @param {object} finalConfig - The output configuration object
    */
   function finishProcessing(configRequest, errors, finalConfig, callback) {
-    var ptr,
-        idx,
+    var idx,
         optionalSet = {},
         keyToCheck;
     if (configRequest.optional) {

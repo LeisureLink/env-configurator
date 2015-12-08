@@ -1,9 +1,6 @@
-'use strict';
-/*jshint -W097*/
-/*global it: false, describe: false*/
 var expect = require('expect'),
     sandboxedModule = require('sandboxed-module'),
-    underTest = sandboxedModule.require('../lib/index.js', {
+    underTest = sandboxedModule.require('../src/index.js', {
       'requires' : {
         'dns': {
           resolveSrv: function (hostname, callback) {
@@ -20,60 +17,60 @@ var expect = require('expect'),
             }
           }
         },
-        'consul': function consulClient(options) {
+        'consul': function consulClient() {
           return {
             'kv': {
               'get': function (options, cb) {
                 setTimeout(
                   function () {
-                    cb(null, options.key == "shared/" ?
+                    cb(null, options.key == 'shared/' ?
                       [
                         {
-                          "CreateIndex": 100,
-                          "ModifyIndex": 200,
-                          "LockIndex": 200,
-                          "Key": "shared/overridden",
-                          "Flags": 0,
-                          "Value": "shared-value-to-be-overridden",
-                          "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
+                          'CreateIndex': 100,
+                          'ModifyIndex': 200,
+                          'LockIndex': 200,
+                          'Key': 'shared/overridden',
+                          'Flags': 0,
+                          'Value': 'shared-value-to-be-overridden',
+                          'Session': 'adf4238a-882b-9ddc-4a9d-5b6758e4159e'
                         },
                         {
-                          "CreateIndex": 100,
-                          "ModifyIndex": 200,
-                          "LockIndex": 200,
-                          "Key": "shared/notoverridden",
-                          "Flags": 0,
-                          "Value": "shared-value",
-                          "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
+                          'CreateIndex': 100,
+                          'ModifyIndex': 200,
+                          'LockIndex': 200,
+                          'Key': 'shared/notoverridden',
+                          'Flags': 0,
+                          'Value': 'shared-value',
+                          'Session': 'adf4238a-882b-9ddc-4a9d-5b6758e4159e'
                         }
                       ] :
                       [
                         {
-                          "CreateIndex": 100,
-                          "ModifyIndex": 200,
-                          "LockIndex": 200,
-                          "Key": options.key + "foo",
-                          "Flags": 0,
-                          "Value": "dGVzdA==",
-                          "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
+                          'CreateIndex': 100,
+                          'ModifyIndex': 200,
+                          'LockIndex': 200,
+                          'Key': options.key + 'foo',
+                          'Flags': 0,
+                          'Value': 'dGVzdA==',
+                          'Session': 'adf4238a-882b-9ddc-4a9d-5b6758e4159e'
                         },
                         {
-                          "CreateIndex": 100,
-                          "ModifyIndex": 200,
-                          "LockIndex": 200,
-                          "Key": "shared/overridden",
-                          "Flags": 0,
-                          "Value": "value-that-has-been-overridden",
-                          "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
+                          'CreateIndex': 100,
+                          'ModifyIndex': 200,
+                          'LockIndex': 200,
+                          'Key': 'shared/overridden',
+                          'Flags': 0,
+                          'Value': 'value-that-has-been-overridden',
+                          'Session': 'adf4238a-882b-9ddc-4a9d-5b6758e4159e'
                         },
                         {
-                          "CreateIndex": 100,
-                          "ModifyIndex": 200,
-                          "LockIndex": 200,
-                          "Key": options.key + "bar",
-                          "Flags": 0,
-                          "Value": "dGVzdA==asd",
-                          "Session": "adf4238a-882b-9ddc-4a9d-5b6758e4159e"
+                          'CreateIndex': 100,
+                          'ModifyIndex': 200,
+                          'LockIndex': 200,
+                          'Key': options.key + 'bar',
+                          'Flags': 0,
+                          'Value': 'dGVzdA==asd',
+                          'Session': 'adf4238a-882b-9ddc-4a9d-5b6758e4159e'
                         }
                       ]);
                   }, 250);
@@ -83,20 +80,19 @@ var expect = require('expect'),
         }
       }
     }),
-    AssertionError = require('assert').AssertionError,
-    assert = require('assert');
+    AssertionError = require('assert').AssertionError;
 
 describe('env-configurator lib', function () {
   it('should throw an error if given an undefined config object or config was not an object', function () {
     try {
       underTest(undefined, function () { });
-      throw new Error("Should not have passed error catch blocks");
+      throw new Error('Should not have passed error catch blocks');
     } catch (err) {
       expect(err instanceof AssertionError).toBe(true);
     }
     try {
       underTest('foo', function () { });
-      throw new Error("Should not have passed error catch blocks");
+      throw new Error('Should not have passed error catch blocks');
     } catch (err) {
       expect(err instanceof AssertionError).toBe(true);
     }
@@ -105,13 +101,13 @@ describe('env-configurator lib', function () {
   it('should throw an error if given an undefined callback function', function () {
     try {
       underTest({}, null);
-      throw new Error("Should not have passed error catch blocks");
+      throw new Error('Should not have passed error catch blocks');
     } catch (err) {
       expect(err instanceof AssertionError).toBe(true);
     }
     try {
       underTest({}, 'foo');
-      throw new Error("Should not have passed error catch blocks");
+      throw new Error('Should not have passed error catch blocks');
     } catch (err) {
       expect(err instanceof AssertionError).toBe(true);
     }
@@ -130,7 +126,7 @@ describe('env-configurator lib', function () {
       keys: [
         '#/me'
       ]
-    }, function (err, config) {
+    }, function (err) {
       expect(err).toNotBe(null);
       done();
     });
@@ -223,7 +219,7 @@ describe('env-configurator lib', function () {
     }, function (err, config) {
       expect(err).toBe(null);
       expect(config).toNotBe(null);
-      expect(config.notoverridden).toBe("shared-value");
+      expect(config.notoverridden).toBe('shared-value');
       done();
     });
   });
@@ -241,7 +237,7 @@ describe('env-configurator lib', function () {
     }, function (err, config) {
       expect(err).toBe(null);
       expect(config).toNotBe(null);
-      expect(config.overridden).toBe("value-that-has-been-overridden");
+      expect(config.overridden).toBe('value-that-has-been-overridden');
       done();
     });
   });

@@ -1,26 +1,24 @@
-﻿'use strict';
-/*jshint -W097*/
-/*global it: false, describe: false*/
-var expect = require('expect')
-  , sandboxedModule = require('sandboxed-module')
-  , AssertionError = require('assert').AssertionError;
-var getConfig = sandboxedModule.require('../lib/dns.js', {
-  requires: { 'dns': {
+var expect = require('expect');
+var sandboxedModule = require('sandboxed-module');
+var AssertionError = require('assert').AssertionError;
+var getConfig = sandboxedModule.require('../src/dns.js', {
+  requires: {
+    'dns': {
       _validResults: [{ 'priority': 10, 'weight': 9, 'port': 27017, 'name': 'bar.example.com' },
-            { 'priority': 10, 'weight': 5, 'port': 553, 'name': 'bar.example.com' },
-            { 'priority': 20, 'weight': 5, 'port': 553, 'name': 'baz.example.com' }],
-        resolveSrv: function (hostname, callback) {
-          if (hostname === 'bar.services.local') {
-            callback(null, this._validResults);
+        { 'priority': 10, 'weight': 5, 'port': 553, 'name': 'bar.example.com' },
+        { 'priority': 20, 'weight': 5, 'port': 553, 'name': 'baz.example.com' }],
+      resolveSrv: function (hostname, callback) {
+        if (hostname === 'bar.services.local') {
+          callback(null, this._validResults);
         } else {
           callback(new Error('Test'));
         }
-        }
-    }}
+      }
+    }
+  }
 });
 
 describe('dns-configurator', function () {
-  
   it('should throw an error is not passed a call back function', function () {
     try {
       getConfig({}, {}, 'foo');
@@ -69,13 +67,13 @@ describe('dns-configurator', function () {
         }
       ]
     }, {}, function (err, config) {
-      expect(config['bar.services.local']).toExist("Config should have configuration property");
+      expect(config['bar.services.local']).toExist('Config should have configuration property');
       expect(config['bar.services.local'].key).toBe('#/bar/uri');
       expect(config['bar.services.local'].value).toBe('http://bar.example.com:27017/');
       done();
     });
   });
-  
+
   it('should process a valid response from a SRV record lookup and apply post/pre-fixs', function (done) {
     getConfig({
       'services': [
@@ -93,7 +91,7 @@ describe('dns-configurator', function () {
         'dbname': 'default'
       }
     }, function (err, config) {
-      expect(config['bar.services.local']).toExist("Config should have configuration property");
+      expect(config['bar.services.local']).toExist('Config should have configuration property');
       expect(config['bar.services.local'].value).toBe('http://dev.bar.example.com:27017/default');
       expect(config['bar.services.local'].key).toBe('#/bar/uri');
       done();
@@ -116,7 +114,7 @@ describe('dns-configurator', function () {
         'env': 'dev.',
       }
     }, function (err, config) {
-      expect(config['bar.services.local']).toExist("Config should have configuration property");
+      expect(config['bar.services.local']).toExist('Config should have configuration property');
       expect(config['bar.services.local'].value).toBe('http://dev.bar.example.com:27017/');
       expect(config['bar.services.local'].key).toBe('#/bar/uri');
       done();

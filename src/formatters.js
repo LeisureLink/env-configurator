@@ -3,7 +3,6 @@
  * @module lib/formatters
  */
 module.exports = (function () {
-  'use strict';
   var formatters = {};
   /**
    * Uri Formatter
@@ -21,7 +20,7 @@ module.exports = (function () {
    * @name module:lib/formatters#mongodb
    * @kind function
    * @param {object} addresses - An array of address objects from the DNS package @see {@link http://nodejs.org/api/dns.html#dns_dns_resolvesrv_hostname_callback }
-   * @param {string} prefix - A prefix that can optionally be added formatted service locator URLs 
+   * @param {string} prefix - A prefix that can optionally be added formatted service locator URLs
    * @param {string} suffix - A suffix that can optionally be added formatted service locator URLs
    * @returns {string} An incomplete mongodb url--the client must postpend a database name to the url
    */
@@ -38,7 +37,7 @@ module.exports = (function () {
    * @name module:lib/formatters#bareName
    * @kind function
    * @param {object} addresses - An array of address objects from the DNS package @see {@link http://nodejs.org/api/dns.html#dns_dns_resolvesrv_hostname_callback }
-   * @param {string} prefix - A prefix that can optionally be added formatted service locator URLs 
+   * @param {string} prefix - A prefix that can optionally be added formatted service locator URLs
    * @param {string} suffix - A suffix that can optionally be added formatted service locator URLs
    * @returns {string} A bare DNS name
    */
@@ -55,7 +54,7 @@ module.exports = (function () {
    * @name module:lib/formatters#http
    * @kind function
    * @param {object} addresses - An array of address objects from the DNS package @see {@link http://nodejs.org/api/dns.html#dns_dns_resolvesrv_hostname_callback }
-   * @param {string} prefix - A prefix that can optionally be added formatted service locator URLs 
+   * @param {string} prefix - A prefix that can optionally be added formatted service locator URLs
    * @param {string} suffix - A suffix that can optionally be added formatted service locator URLs
    * @returns {string} A HTTP service URL using the port specified by the service record
    */
@@ -72,7 +71,7 @@ module.exports = (function () {
    * @name module:lib/formatters#https
    * @kind function
    * @param {object} addresses - An array of address objects from the DNS package @see {@link http://nodejs.org/api/dns.html#dns_dns_resolvesrv_hostname_callback }
-   * @param {string} prefix - A prefix that can optionally be added formatted service locator URLs 
+   * @param {string} prefix - A prefix that can optionally be added formatted service locator URLs
    * @param {string} suffix - A suffix that can optionally be added formatted service locator URLs
    * @returns {string} A HTTPS service URL using the port specified by the service record
    */

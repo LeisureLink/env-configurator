@@ -1,5 +1,3 @@
-﻿'use strict';
-
 import Logger from './src/logger';
 
 let logger = Logger('index');
